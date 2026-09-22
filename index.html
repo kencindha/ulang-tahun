@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Ulang Tahun Mutiaa!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Menggunakan canvas-confetti untuk efek confetti yang meriah -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* Mengatur font secara global */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            overflow-x: hidden; /* Mencegah scroll horizontal */
+        }
+
+        h1, h2, h3, .heading-font {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        /* Kelas untuk menyembunyikan elemen sebelum dianimasikan */
+        .hidden-element {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .show-element {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- Efek Mengetik (Typewriter) --- */
+        .typewriter h1 {
+            overflow: hidden;
+            border-right: .15em solid #ff6b6b; /* Warna kursor */
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .05em;
+            animation: 
+                typing 3.5s steps(40, end),
+                blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #ff6b6b; }
+        }
+
+        /* --- Animasi Melayang (Floating) --- */
+        .floating {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* --- Kotak Kado (Gift Box) Interaktif --- */
+        .giftbox {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .giftbox:hover {
+            transform: scale(1.05);
+        }
+
+        .giftbox .box {
+            position: absolute;
+            bottom: 0;
+            width: 150px;
+            height: 100px;
+            background-color: #ffb6b9; /* Warna dasar kotak */
+            border: 4px solid #fa9296;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Pita vertikal kotak */
+        .giftbox .box::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 100%;
+            background-color: #f6e58d;
+        }
+
+        /* Tutup kotak */
+        .giftbox .lid {
+            position: absolute;
+            bottom: 96px; /* Tepat di atas kotak */
+            left: -10px;
+            width: 170px;
+            height: 40px;
+            background-color: #ffb6b9;
+            border: 4px solid #fa9296;
+            border-radius: 5px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            transition: transform 0.5s ease-in-out;
+            transform-origin: bottom center;
+            z-index: 10;
+        }
+
+        /* Pita pada tutup */
+        .giftbox .lid::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 100%;
+            background-color: #f6e58d;
+        }
+
+        /* Simpul pita */
+        .giftbox .bow {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 30px;
+            z-index: 11;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .giftbox .bow::before, .giftbox .bow::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border: 5px solid #f6e58d;
+            border-radius: 50%;
+        }
+        
+        .giftbox .bow::before { left: 0; }
+        .giftbox .bow::after { right: 0; }
+
+        /* Animasi saat kado diklik (dibuka) */
+        .giftbox.open .lid {
+            transform: translateY(-80px) rotate(-15deg);
+        }
+        
+        .giftbox.open .bow {
+            transform: translateX(-50%) translateY(-80px) rotate(-15deg);
+        }
+
+        /* Teks kejutan dari dalam kotak */
+        .gift-message {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #ff6b6b;
+            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
+        }
+
+        .giftbox.open .gift-message {
+            transform: translateX(-50%) translateY(-100px) scale(1);
+        }
+
+        /* --- Kue Ulang Tahun --- */
+        .cake {
+            position: relative;
+            width: 250px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .plate {
+            width: 270px;
+            height: 110px;
+            position: absolute;
+            bottom: -10px;
+            left: -10px;
+            background-color: #ccc;
+            border-radius: 50%;
+            box-shadow: 0 2px 0 #b3b3b3, 0 4px 0 #b3b3b3, 0 5px 40px rgba(0,0,0,0.5);
+        }
+
+        .layer {
+            position: absolute;
+            display: block;
+            width: 250px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #f7a9a8;
+            box-shadow: 
+                0 2px 0px #eb9a99, 
+                0 4px 0px #eb9a99, 
+                0 6px 0px #eb9a99, 
+                0 8px 0px #eb9a99, 
+                0 10px 0px #eb9a99, 
+                0 12px 0px #eb9a99, 
+                0 14px 0px #eb9a99, 
+                0 16px 0px #eb9a99, 
+                0 18px 0px #eb9a99, 
+                0 20px 0px #eb9a99, 
+                0 22px 0px #eb9a99, 
+                0 24px 0px #eb9a99, 
+                0 26px 0px #eb9a99, 
+                0 28px 0px #eb9a99, 
+                0 30px 0px #eb9a99;
+        }
+
+        .layer-top { top: 0px; }
+        .layer-middle { top: 33px; }
+        .layer-bottom { top: 66px; }
+
+        .icing {
+            top: 2px;
+            left: 5px;
+            background-color: #f0e4d0;
+            width: 240px;
+            height: 90px;
+            border-radius: 50%;
+        }
+
+        .icing:before {
+            content: "";
+            position: absolute;
+            top: 4px;
+            right: 5px;
+            bottom: 6px;
+            left: 5px;
+            background-color: #f5ebda;
+            box-shadow: 
+                0 0 4px #f6efe3, 
+                0 0 4px #f6efe3, 
+                0 0 4px #f6efe3;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .drip {
+            display: block;
+            width: 50px;
+            height: 60px;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            background-color: #f0e4d0;
+            position: absolute;
+            top: 40px;
+            z-index: 2;
+        }
+
+        .drip1 { top: 43px; left: 5px; transform: skewY(15deg); height: 48px; width: 40px; }
+        .drip2 { top: 59px; left: 41px; transform: skewY(15deg); }
+        .drip3 { top: 70px; left: 90px; width: 80px; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; }
+        .drip4 { top: 59px; left: 160px; transform: skewY(-15deg); }
+        .drip5 { top: 43px; left: 205px; transform: skewY(-15deg); height: 48px; width: 40px; }
+
+        /* Lilin */
+        .candle {
+            background-color: #7B020B;
+            width: 16px;
+            height: 50px;
+            border-radius: 8px / 4px;
+            top: -20px;
+            left: 50%;
+            margin-left: -8px;
+            z-index: 10;
+            position: absolute;
+        }
+
+        .candle:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 16px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ad030f;
+        }
+
+        /* Api Lilin */
+        .flame {
+            position: absolute;
+            background-color: orange;
+            width: 15px;
+            height: 35px;
+            border-radius: 10px 10px 10px 10px / 25px 25px 10px 10px;
+            top: -34px;
+            left: 50%;
+            margin-left: -7.5px;
+            z-index: 10;
+            box-shadow: 
+                0 0 10px rgba(255, 165, 0, 0.5), 
+                0 0 20px rgba(255, 165, 0, 0.5), 
+                0 0 60px rgba(255, 165, 0, 0.5), 
+                0 0 80px rgba(255, 165, 0, 0.5);
+            transform-origin: 50% 90%;
+            animation: flicker 1s ease-in-out alternate infinite;
+        }
+
+        @keyframes flicker {
+            0% { transform: skewX(5deg); box-shadow: 0 0 10px rgba(255, 165, 0, 0.2), 0 0 20px rgba(255, 165, 0, 0.2), 0 0 60px rgba(255, 165, 0, 0.2), 0 0 80px rgba(255, 165, 0, 0.2); }
+            25% { transform: skewX(-5deg); box-shadow: 0 0 10px rgba(255, 165, 0, 0.5), 0 0 20px rgba(255, 165, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.5), 0 0 80px rgba(255, 165, 0, 0.5); }
+            50% { transform: skewX(10deg); box-shadow: 0 0 10px rgba(255, 165, 0, 0.3), 0 0 20px rgba(255, 165, 0, 0.3), 0 0 60px rgba(255, 165, 0, 0.3), 0 0 80px rgba(255, 165, 0, 0.3); }
+            75% { transform: skewX(-10deg); box-shadow: 0 0 10px rgba(255, 165, 0, 0.4), 0 0 20px rgba(255, 165, 0, 0.4), 0 0 60px rgba(255, 165, 0, 0.4), 0 0 80px rgba(255, 165, 0, 0.4); }
+            100% { transform: skewX(5deg); box-shadow: 0 0 10px rgba(255, 165, 0, 0.5), 0 0 20px rgba(255, 165, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.5), 0 0 80px rgba(255, 165, 0, 0.5); }
+        }
+
+        /* Saat lilin ditiup (api hilang) */
+        .flame.out {
+            display: none;
+        }
+
+        /* --- Balon --- */
+        .balloon {
+            position: fixed;
+            bottom: -150px;
+            width: 60px;
+            height: 75px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            z-index: -1;
+            opacity: 0.8;
+            animation: riseup 10s linear infinite;
+        }
+
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 5px 10px 5px;
+            border-color: transparent transparent inherit transparent;
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            width: 2px;
+            height: 60px;
+            background-color: #ccc;
+        }
+
+        @keyframes riseup {
+            0% { transform: translateY(0) rotate(0); }
+            20% { transform: translateY(-20vh) rotate(-10deg); }
+            40% { transform: translateY(-40vh) rotate(10deg); }
+            60% { transform: translateY(-60vh) rotate(-10deg); }
+            80% { transform: translateY(-80vh) rotate(10deg); }
+            100% { transform: translateY(-110vh) rotate(0); }
+        }
+
+        /* Latar Belakang Gradasi Dinamis */
+        .bg-gradient-animate {
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+    </style>
+</head>
+<body class="bg-gradient-animate text-gray-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Container Utama -->
+    <main class="container mx-auto px-4 py-10 max-w-3xl flex-grow flex flex-col items-center justify-center relative z-10">
+        
+        <!-- Bagian 1: Layar Pembuka (Tombol Mulai) -->
+        <div id="start-screen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+            <h2 class="text-3xl md:text-5xl text-pink-500 mb-8 text-center px-4">Ada Kejutan Untukmu! 🎁</h2>
+            <button id="start-btn" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transform transition hover:scale-110 active:scale-95 text-xl">
+                Buka Kejutan
+            </button>
+            <p class="mt-4 text-gray-400 text-sm">Pastikan suaramu aktif! 🔊</p>
+        </div>
+
+        <!-- Bagian 2: Konten Utama (Awalnya tersembunyi) -->
+        <div id="main-content" class="hidden-element w-full flex flex-col items-center">
+            
+            <!-- Header Ucapan dengan Efek Mengetik -->
+            <div class="text-center mb-12 typewriter w-full max-w-full">
+                <h1 id="greeting-text" class="text-4xl md:text-6xl lg:text-7xl text-pink-600 drop-shadow-md">
+                    Happy Birthday!
+                </h1>
+            </div>
+
+            <!-- Pesan Singkat -->
+            <div class="bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-3xl shadow-xl text-center mb-16 floating border-2 border-pink-200">
+                <p class="text-xl md:text-2xl font-medium text-gray-700 mb-4 leading-relaxed">
+                    Selamat bertambah usia, <span id="nama-penerima" class="text-pink-500 font-bold">Sahabatku</span>! 🥳
+                </p>
+                <p class="text-gray-600 text-md md:text-lg">
+                    Semoga hari ini dipenuhi dengan tawa, kebahagiaan, dan cinta. Terima kasih sudah menjadi orang yang luar biasa!
+                </p>
+            </div>
+
+            <!-- Area Interaktif: Kue Ulang Tahun -->
+            <div class="mb-20 text-center w-full">
+                <h3 class="text-2xl text-purple-600 mb-6 heading-font">Tiup Lilinnya! (Klik Apinya) 🎂</h3>
+                
+                <div class="cake mt-8">
+                    <div class="plate"></div>
+                    <div class="layer layer-bottom"></div>
+                    <div class="layer layer-middle"></div>
+                    <div class="layer layer-top"></div>
+                    <div class="icing"></div>
+                    <div class="drip drip1"></div>
+                    <div class="drip drip2"></div>
+                    <div class="drip drip3"></div>
+                    <div class="drip drip4"></div>
+                    <div class="drip drip5"></div>
+                    
+                    <div class="candle">
+                        <div id="flame" class="flame cursor-pointer" title="Klik untuk meniup!"></div>
+                    </div>
+                </div>
+                
+                <!-- Pesan setelah lilin ditiup -->
+                <div id="wish-message" class="opacity-0 transition-opacity duration-1000 mt-12 bg-purple-100 p-4 rounded-xl text-purple-700 font-bold border border-purple-300">
+                    Yay! Make a wish! Semoga semua harapanmu terkabul ✨
+                </div>
+            </div>
+
+            <!-- Area Interaktif: Kado -->
+            <div class="mb-10 text-center flex flex-col items-center">
+                <h3 class="text-2xl text-blue-600 mb-8 heading-font">Ada satu lagi, buka kadonya! 🎁</h3>
+                
+                <div id="gift-box" class="giftbox mt-4">
+                    <div class="gift-message heading-font" id="gift-text">Selamat Hari Menetas! 🎉</div>
+                    <div class="box"></div>
+                    <div class="lid"></div>
+                    <div class="bow"></div>
+                </div>
+            </div>
+
+            <!-- Gallery/Foto Tambahan (Opsional, placeholder) -->
+            <div class="mt-16 mb-8 text-center w-full bg-white/60 p-6 rounded-2xl">
+                <h3 class="text-xl text-gray-700 mb-4 font-semibold">Senyummu hari ini! 😊</h3>
+                <div class="flex justify-center gap-4 flex-wrap">
+                    <!-- Gunakan placeholder image berwarna -->
+                    <img src="WhatsApp Image 2026-08-07 at 21.51.07.jpeg" alt="Kenangan 1" class="rounded-lg shadow-md rotate-[-5deg] hover:rotate-0 transition-transform cursor-pointer border-4 border-white">
+                    <img src="WhatsApp Image 2026-08-07 at 21.51.06 (2).jpeg" alt="Kenangan 2" class="rounded-lg shadow-md rotate-[3deg] hover:rotate-0 transition-transform cursor-pointer border-4 border-white">
+                </div>
+                <p class="text-sm text-gray-500 mt-4">(Anjay ada GW !)</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-gray-500 text-sm z-10 bg-white/30 backdrop-blur-sm">
+        Dibuat dengan dengan cepat cepat wkw.
+    </footer>
+
+    <!-- Wadah untuk balon yang akan digenerate oleh JS -->
+    <div id="balloon-container"></div>
+
+    <!-- Elemen Audio (Opsional, bisa diisi link lagu selamat ulang tahun) -->
+    <audio id="bgMusic" loop>
+        <source src="Jamrud - Selamat Ulang Tahun Original.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // --- Konfigurasi ---
+        // Anda bisa mengganti nama di sini
+        const namaPenerima = "Mutia"; 
+        document.getElementById('nama-penerima').textContent = namaPenerima;
+        
+        // --- Elemen DOM ---
+        const startBtn = document.getElementById('start-btn');
+        const startScreen = document.getElementById('start-screen');
+        const mainContent = document.getElementById('main-content');
+        const flame = document.getElementById('flame');
+        const wishMessage = document.getElementById('wish-message');
+        const giftBox = document.getElementById('gift-box');
+        const balloonContainer = document.getElementById('balloon-container');
+
+        // --- Logika Memulai (Start) ---
+        startBtn.addEventListener('click', () => {
+            // Sembunyikan layar pembuka
+            startScreen.style.opacity = '0';
+            
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+                
+                // Tampilkan konten utama dengan animasi
+                mainContent.classList.remove('hidden-element');
+                mainContent.classList.add('show-element');
+
+                // Tembakkan sedikit confetti di awal
+                shootConfetti(0.5, 0.5);
+                
+                // Generate balon terbang
+                createBalloons(15);
+
+                // Jika ada musik, mainkan di sini
+                const audio = document.getElementById('bgMusic');
+                if(audio) audio.play();
+
+            }, 500); // Tunggu animasi pudar selesai
+        });
+
+        // --- Logika Tiup Lilin ---
+        flame.addEventListener('click', () => {
+            // Matikan api
+            flame.classList.add('out');
+            
+            // Tampilkan pesan harapan
+            wishMessage.classList.remove('opacity-0');
+            wishMessage.classList.add('opacity-100');
+
+            // Tembakkan confetti meriah dari bawah
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                // Confetti dari dua sisi
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        });
+
+        // --- Logika Buka Kado ---
+        giftBox.addEventListener('click', () => {
+            // Tambahkan class 'open' untuk memicu animasi CSS
+            if (!giftBox.classList.contains('open')) {
+                giftBox.classList.add('open');
+                
+                // Tembakkan confetti dari posisi kado
+                const rect = giftBox.getBoundingClientRect();
+                const x = (rect.left + (rect.width / 2)) / window.innerWidth;
+                const y = (rect.top + (rect.height / 2)) / window.innerHeight;
+                
+                shootConfetti(x, y, 100);
+            }
+        });
+
+        // --- Fungsi Bantuan (Helper Functions) ---
+
+        // Fungsi menembakkan confetti sederhana
+        function shootConfetti(x, y, count = 50) {
+            confetti({
+                particleCount: count,
+                spread: 70,
+                origin: { x: x, y: y },
+                colors: ['#ff9a9e', '#fecfef', '#a1c4fd', '#f6e58d', '#ff6b6b']
+            });
+        }
+
+        // Fungsi membuat balon warna-warni terbang
+        function createBalloons(jumlah) {
+            const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe', '#fd79a8'];
+            
+            for (let i = 0; i < jumlah; i++) {
+                const balloon = document.createElement('div');
+                balloon.classList.add('balloon');
+                
+                // Styling acak
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.backgroundColor = color;
+                balloon.style.borderColor = color; // Untuk ujung balon
+                
+                // Posisi dan durasi acak
+                balloon.style.left = Math.random() * 100 + 'vw';
+                balloon.style.animationDuration = (Math.random() * 15 + 10) + 's'; // 10-25 detik
+                balloon.style.animationDelay = (Math.random() * 10) + 's'; // Delay 0-10 detik
+
+                balloonContainer.appendChild(balloon);
+            }
+        }
+    </script>
+</body>
+</html>
